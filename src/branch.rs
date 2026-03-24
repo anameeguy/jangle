@@ -5,7 +5,12 @@ use serde::{Deserialize, Serialize};
 use crate::Data;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Branch(pub HashMap<String, Data>);
+pub struct Branch {
+    /// The stuff that is, ya know, in the branch.
+    pub stuff: HashMap<String, Data>,
+    /// If this is active then it will be used to conider the root rather then the branch name.
+    pub root_name: Option<String>,
+}
 
 impl Branch {
     pub fn new() -> Self {
@@ -23,6 +28,9 @@ impl Branch {
 
 impl Default for Branch {
     fn default() -> Self {
-        Self(HashMap::new())
+        Self {
+            stuff: HashMap::new(),
+            root_name: None,
+        }
     }
 }

@@ -1,4 +1,5 @@
 use clap::Parser;
+use jangle::DotPath;
 
 use crate::{
     command::{Cli, Commands},
@@ -12,6 +13,21 @@ mod sheet;
 mod working_sheet;
 
 fn main() {
+    let beep = DotPath::new("[[root-place]].");
+    println!("{beep:?}");
+    return;
+
+    //
+
+    //
+
+    //
+
+    //
+
+    //
+
+    #[allow(unreachable_code)]
     let cli = Cli::parse();
 
     // You can check for the existence of subcommands, and if found use their
