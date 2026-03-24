@@ -36,6 +36,10 @@ impl std::fmt::Display for TrueRoot {
                 ));
             }
 
+            if let Some(new) = total.strip_suffix("\n") {
+                total = new.to_string();
+            }
+
             return total;
         }
 
