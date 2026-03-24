@@ -1,0 +1,21 @@
+[package]
+name = "jangle"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+evil-id = { version = "0.1.3", features = ["serde"] }
+ron = "0.12.0"
+serde = { version = "1.0.228", features = ["derive"] }
+
+
+
+[target.'cfg(not(feature = "library_only"))'.dependencies]
+directories = "6.0.0"
+clap = { version = "4.6.0", features = ["derive"] }
+
+
+
+[[bin]]
+name = "cli"
+path = "cli/main.rs"
