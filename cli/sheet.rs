@@ -4,14 +4,14 @@ use std::{
     path::PathBuf,
 };
 
-use jangle::Branch;
+use jangle::TrueRoot;
 use ron::Value;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Sheet {
     pub is_sheet: IsSheet,
-    pub root: Branch,
+    pub true_root: TrueRoot,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -51,5 +51,10 @@ impl Sheet {
         let s = ron::to_string(self).unwrap();
         file.write_all(s.as_bytes())
             .expect("Unable to write to sheet file.");
+    }
+
+    pub fn load<P: Into<PathBuf>>(path: P) -> Self {
+        let contents = fs::read_to_string(path.into()).expect("Unable to read sheet file.");
+        ron::from_str(&contents).unwrap()
     }
 }

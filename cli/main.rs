@@ -1,5 +1,4 @@
 use clap::Parser;
-use jangle::DotPath;
 
 use crate::{
     command::{Cli, Commands},
@@ -13,9 +12,10 @@ mod sheet;
 mod working_sheet;
 
 fn main() {
-    let beep = DotPath::new("[[TRUEROOT]].beep1.beep2.beep3").unwrap();
-    println!("{beep:?}");
-    println!("{beep}");
+    let sheet = Sheet::load("elaugdrin.sheet");
+
+    println!("{sheet:?}");
+    println!("{}", sheet.true_root);
     return;
 
     //
