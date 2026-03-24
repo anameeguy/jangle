@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -19,7 +21,6 @@ pub enum Ending {
 pub enum RootType {
     Local,
     Root(String),
-    /// This is used internally and should never actually be created RAW.
     TrueRoot,
 }
 
@@ -49,6 +50,10 @@ impl DotPath {
 
             // If the end is `]]` then make `new_s` empty
             if end_root != stripped.len() - 2 {
+                // Make sure that period is directly after `]]`
+                if stripped.chars().nth(end_root + 2).unwrap() != '.' {
+                    return Err(DotPathCreationError::MalformedRootError(s.into()));
+                }
                 new_s = &stripped[end_root + 3..];
             } else {
                 if ending == Ending::Data {
@@ -59,7 +64,12 @@ impl DotPath {
                 new_s = "";
             }
 
-            RootType::Root(stripped[..end_root].to_string())
+            let root = &stripped[..end_root];
+            if root != "TRUEROOT" {
+                RootType::Root(root.to_string())
+            } else {
+                RootType::TrueRoot
+            }
         } else {
             RootType::Local
         };
@@ -84,6 +94,33 @@ impl DotPath {
     }
 }
 
+impl Display for DotPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.root {
+            RootType::Root(root) => {
+                write!(f, "[[{root}]]")?;
+            }
+            RootType::TrueRoot => {
+                write!(f, "[[TRUEROOT]]")?;
+            }
+            _ => {}
+        }
+
+        if self.root != RootType::Local && !self.branches.is_empty() {
+            write!(f, ".")?;
+        }
+
+        let da_rest = self.branches.join(".");
+        write!(f, "{da_rest}")?;
+
+        if self.ending == Ending::Branch {
+            write!(f, ".")?;
+        }
+
+        Ok(())
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum DotPathCreationError {
     #[error("Unable to root branch for: {0}")]
@@ -94,4 +131,98 @@ pub enum DotPathCreationError {
 
     #[error("There is no such thing as a root data value, like \"{0}\" seems to be trying to do.")]
     PointingAtRootDataError(String),
+
+    #[error("Malformed root: {0}")]
+    MalformedRootError(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn roundtrip(s: &str) {
+        let parsed = DotPath::new(s).unwrap();
+        let printed = parsed.to_string();
+        assert_eq!(printed, s, "Roundtrip failed: {s} -> {printed}");
+    }
+
+    #[test]
+    fn basic_paths() {
+        roundtrip("a");
+        roundtrip("a.b");
+        roundtrip("a.b.c");
+    }
+
+    #[test]
+    fn branch_paths() {
+        roundtrip("a.");
+        roundtrip("a.b.");
+    }
+
+    #[test]
+    fn root_paths() {
+        roundtrip("[[root]].a");
+        roundtrip("[[root]].a.b");
+        roundtrip("[[TRUEROOT]].a");
+    }
+
+    #[test]
+    fn root_branch_paths() {
+        roundtrip("[[root]].");
+        roundtrip("[[TRUEROOT]].");
+    }
+
+    #[test]
+    fn empty_branches_fail() {
+        assert!(DotPath::new("a..b").is_err());
+        assert!(DotPath::new(".a").is_err());
+        assert!(DotPath::new("a.").is_ok()); // valid branch ending
+    }
+
+    #[test]
+    fn malformed_root_fails() {
+        assert!(DotPath::new("[[root]").is_err());
+        assert!(DotPath::new("[[root]a").is_err());
+        assert!(DotPath::new("[[root]]a").is_err());
+    }
+
+    #[test]
+    fn root_without_branch_is_invalid() {
+        // According to your rule: root must be a branch
+        assert!(DotPath::new("[[root]]").is_err());
+    }
+
+    #[test]
+    fn display_never_produces_invalid_strings() {
+        let paths = vec![
+            DotPath {
+                branches: vec!["a".into()],
+                root: RootType::Local,
+                ending: Ending::Data,
+            },
+            DotPath {
+                branches: vec!["a".into()],
+                root: RootType::Local,
+                ending: Ending::Branch,
+            },
+            DotPath {
+                branches: vec!["a".into()],
+                root: RootType::Root("r".into()),
+                ending: Ending::Data,
+            },
+            DotPath {
+                branches: vec!["a".into()],
+                root: RootType::Root("r".into()),
+                ending: Ending::Branch,
+            },
+        ];
+
+        for p in paths {
+            let s = p.to_string();
+            assert!(
+                DotPath::new(&s).is_ok(),
+                "Display produced invalid string: {s}"
+            );
+        }
+    }
 }

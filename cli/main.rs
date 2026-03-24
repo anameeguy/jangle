@@ -13,8 +13,9 @@ mod sheet;
 mod working_sheet;
 
 fn main() {
-    let beep = DotPath::new("[[root-place]].beep1.beep2.beep3.").unwrap();
+    let beep = DotPath::new("[[TRUEROOT]].beep1.beep2.beep3").unwrap();
     println!("{beep:?}");
+    println!("{beep}");
     return;
 
     //
