@@ -15,7 +15,7 @@ fn main() {
     let sheet = Sheet::load("elaugdrin.sheet");
 
     println!("{sheet:?}");
-    println!("{}", sheet.true_root);
+    print!("{}", sheet.true_root);
     return;
 
     //
