@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Branch, DotPath};
+use crate::{Branch, DotPath, PositionedDotPath, TrueDotPath};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TrueRoot {
@@ -9,7 +9,11 @@ pub struct TrueRoot {
 
 impl TrueRoot {
     #[allow(unused_variables)]
-    pub fn truly_root_dotpath(&self, dotpath: DotPath, local: DotPath) -> DotPath {
+    pub fn truly_root_dotpath(
+        &self,
+        positioned_dotpath: PositionedDotPath,
+        locality: TrueDotPath,
+    ) -> DotPath {
         todo!()
     }
 }

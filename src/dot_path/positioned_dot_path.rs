@@ -4,16 +4,26 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     DotPath,
-    dot_path::{DotPathCreationError, Ending, IS_BRANCH_SYMBOL, TRUE_ROOT_SYMBOL},
+    dot_path::{
+        DEFINED_ROOT_END, DEFINED_ROOT_START, DotPathCreationError, Ending, IS_BRANCH_SYMBOL,
+        LOCAL_SYMBOL,
+    },
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct TrueDotPath {
+pub struct PositionedDotPath {
     pub branches: Vec<String>,
+    pub root: RootType,
     pub ending: Ending,
 }
 
-impl TrueDotPath {
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
+pub enum RootType {
+    Local,
+    Root(String),
+}
+
+impl PositionedDotPath {
     pub fn new(s: &str) -> Result<Self, DotPathCreationError> {
         let mut new_s = s;
 
@@ -39,27 +49,44 @@ impl TrueDotPath {
         }
 
         let first = branches.remove(0);
-        if first != TRUE_ROOT_SYMBOL.to_string() {
+        let root = if first == LOCAL_SYMBOL.to_string() {
+            RootType::Local
+        } else if first.starts_with(DEFINED_ROOT_START) && first.ends_with(DEFINED_ROOT_END) {
+            RootType::Root(
+                first
+                    .strip_prefix(DEFINED_ROOT_START)
+                    .unwrap()
+                    .strip_suffix(DEFINED_ROOT_END)
+                    .unwrap()
+                    .to_string(),
+            )
+        } else {
             return Err(DotPathCreationError::UndefinedRootError(first));
-        }
+        };
 
         if branches.is_empty() && ending == Ending::Data {
             return Err(DotPathCreationError::PointingAtRootDataError(s.to_string()));
         }
 
         #[allow(unreachable_code)]
-        Ok(Self { branches, ending })
+        Ok(Self {
+            branches,
+            ending,
+            root,
+        })
     }
-
-    pub const TRUE_ROOT: Self = Self {
-        branches: Vec::new(),
-        ending: Ending::Branch,
-    };
 }
 
-impl Display for TrueDotPath {
+impl Display for PositionedDotPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{TRUE_ROOT_SYMBOL}")?;
+        match &self.root {
+            RootType::Root(root) => {
+                write!(f, "{DEFINED_ROOT_START}{root}{DEFINED_ROOT_END}")?;
+            }
+            RootType::Local => {
+                write!(f, "{LOCAL_SYMBOL}")?;
+            }
+        }
 
         if !self.branches.is_empty() {
             write!(f, ".")?;
@@ -76,8 +103,8 @@ impl Display for TrueDotPath {
     }
 }
 
-impl Into<DotPath> for TrueDotPath {
+impl Into<DotPath> for PositionedDotPath {
     fn into(self) -> DotPath {
-        DotPath::True(self)
+        DotPath::Positioned(self)
     }
 }
