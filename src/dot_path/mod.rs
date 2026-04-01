@@ -30,9 +30,37 @@ impl DotPath {
             PositionedDotPath::new(s).map(|pdp| DotPath::Positioned(pdp))
         }
     }
+
+    pub fn parts(&self) -> &Vec<String> {
+        match self {
+            DotPath::Positioned(positioned_dot_path) => &positioned_dot_path.parts,
+            DotPath::True(true_dot_path) => &true_dot_path.parts,
+        }
+    }
+
+    pub fn parts_mut(&mut self) -> &mut Vec<String> {
+        match self {
+            DotPath::Positioned(positioned_dot_path) => &mut positioned_dot_path.parts,
+            DotPath::True(true_dot_path) => &mut true_dot_path.parts,
+        }
+    }
+
+    pub fn endings(&self) -> Ending {
+        match self {
+            DotPath::Positioned(positioned_dot_path) => positioned_dot_path.ending,
+            DotPath::True(true_dot_path) => true_dot_path.ending,
+        }
+    }
+
+    pub fn endings_mut(&mut self) -> &mut Ending {
+        match self {
+            DotPath::Positioned(positioned_dot_path) => &mut positioned_dot_path.ending,
+            DotPath::True(true_dot_path) => &mut true_dot_path.ending,
+        }
+    }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, Copy)]
 pub enum Ending {
     Data,
     Branch,

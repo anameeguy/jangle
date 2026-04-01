@@ -6,7 +6,7 @@ fn test_positioned_dotpath_basic() {
     let path_str = "$.foo.bar";
     let pdp = PositionedDotPath::new(path_str).unwrap();
     assert_eq!(pdp.root, RootType::Local);
-    assert_eq!(pdp.branches, vec!["foo".to_string(), "bar".to_string()]);
+    assert_eq!(pdp.parts, vec!["foo".to_string(), "bar".to_string()]);
     assert_eq!(pdp.ending, Ending::Data);
     assert_eq!(pdp.to_string(), path_str);
 }
@@ -28,7 +28,7 @@ fn test_positioned_dotpath_defined_root() {
         _ => panic!("Expected defined root"),
     }
     assert_eq!(
-        pdp.clone().branches,
+        pdp.clone().parts,
         vec!["branch1".to_string(), "branch2".to_string()]
     );
     assert_eq!(pdp.to_string(), path_str);
@@ -38,7 +38,7 @@ fn test_positioned_dotpath_defined_root() {
 fn test_true_dotpath_basic() {
     let path_str = "#.foo.bar";
     let tdp = TrueDotPath::new(path_str).unwrap();
-    assert_eq!(tdp.branches, vec!["foo".to_string(), "bar".to_string()]);
+    assert_eq!(tdp.parts, vec!["foo".to_string(), "bar".to_string()]);
     assert_eq!(tdp.ending, Ending::Data);
     assert_eq!(tdp.to_string(), path_str);
 }
@@ -125,7 +125,7 @@ fn test_true_dotpath_errors() {
 #[test]
 fn test_true_root_constant() {
     let true_root = TrueDotPath::TRUE_ROOT.clone();
-    assert_eq!(true_root.branches.len(), 0);
+    assert_eq!(true_root.parts.len(), 0);
     assert_eq!(true_root.ending, Ending::Branch);
     assert_eq!(true_root.to_string(), "#.");
 }
@@ -179,7 +179,7 @@ fn serde_true_dotpath() {
 fn long_branches_and_unusual_chars() {
     let path = "$.a_1.b-2.c$3.d!e.f@";
     let pdp = PositionedDotPath::new(path).unwrap();
-    assert_eq!(pdp.branches, vec!["a_1", "b-2", "c$3", "d!e", "f@"]);
+    assert_eq!(pdp.parts, vec!["a_1", "b-2", "c$3", "d!e", "f@"]);
     assert_eq!(pdp.to_string(), path);
 }
 

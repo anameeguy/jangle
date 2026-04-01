@@ -9,7 +9,7 @@ use crate::{
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
 pub struct TrueDotPath {
-    pub branches: Vec<String>,
+    pub parts: Vec<String>,
     pub ending: Ending,
 }
 
@@ -48,11 +48,14 @@ impl TrueDotPath {
         }
 
         #[allow(unreachable_code)]
-        Ok(Self { branches, ending })
+        Ok(Self {
+            parts: branches,
+            ending,
+        })
     }
 
     pub const TRUE_ROOT: Self = Self {
-        branches: Vec::new(),
+        parts: Vec::new(),
         ending: Ending::Branch,
     };
 }
@@ -61,11 +64,11 @@ impl Display for TrueDotPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{TRUE_ROOT_SYMBOL}")?;
 
-        if !self.branches.is_empty() {
+        if !self.parts.is_empty() {
             write!(f, ".")?;
         }
 
-        let da_rest = self.branches.join(".");
+        let da_rest = self.parts.join(".");
         write!(f, "{da_rest}")?;
 
         if self.ending == Ending::Branch {

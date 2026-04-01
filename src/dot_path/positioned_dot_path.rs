@@ -12,7 +12,7 @@ use crate::{
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
 pub struct PositionedDotPath {
-    pub branches: Vec<String>,
+    pub parts: Vec<String>,
     pub root: RootType,
     pub ending: Ending,
 }
@@ -70,7 +70,7 @@ impl PositionedDotPath {
 
         #[allow(unreachable_code)]
         Ok(Self {
-            branches,
+            parts: branches,
             ending,
             root,
         })
@@ -88,11 +88,11 @@ impl Display for PositionedDotPath {
             }
         }
 
-        if !self.branches.is_empty() {
+        if !self.parts.is_empty() {
             write!(f, ".")?;
         }
 
-        let da_rest = self.branches.join(".");
+        let da_rest = self.parts.join(".");
         write!(f, "{da_rest}")?;
 
         if self.ending == Ending::Branch {
