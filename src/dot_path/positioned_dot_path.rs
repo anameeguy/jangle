@@ -1,20 +1,20 @@
-use std::fmt::Display;
+use std::{fmt::Display, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    DotPath,
+    BranchPointingType, DataPointingType, PointingType, PointingTypeTrait,
     dot_path::{
-        DEFINED_ROOT_END, DEFINED_ROOT_START, DotPathCreationError, Ending, IS_BRANCH_SYMBOL,
-        LOCAL_SYMBOL,
+        DEFINED_ROOT_END, DEFINED_ROOT_START, DotPathCreationError, IS_BRANCH_SYMBOL, LOCAL_SYMBOL,
     },
+    get_pointing_type,
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct PositionedDotPath {
+pub struct PositionedDotPath<T: PointingTypeTrait> {
     pub parts: Vec<String>,
     pub root: RootType,
-    pub ending: Ending,
+    _phantom: PhantomData<T>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
@@ -23,17 +23,21 @@ pub enum RootType {
     Root(String),
 }
 
-impl PositionedDotPath {
+impl<T: PointingTypeTrait> PositionedDotPath<T> {
     pub fn new(s: &str) -> Result<Self, DotPathCreationError> {
         let mut new_s = s;
 
         // Check if this is a branch.
         let ending = if let Some(stripped) = new_s.strip_suffix(IS_BRANCH_SYMBOL) {
             new_s = stripped;
-            Ending::Branch
+            PointingType::Branch
         } else {
-            Ending::Data
+            PointingType::Data
         };
+
+        if ending != get_pointing_type::<T>() {
+            return Err(DotPathCreationError::WrongEndingIGuess);
+        }
 
         if new_s.is_empty() {
             return Err(DotPathCreationError::IsEmpty);
@@ -64,20 +68,20 @@ impl PositionedDotPath {
             return Err(DotPathCreationError::UndefinedRootError(first));
         };
 
-        if branches.is_empty() && ending == Ending::Data {
+        if branches.is_empty() && ending == PointingType::Data {
             return Err(DotPathCreationError::PointingAtRootDataError(s.to_string()));
         }
 
         #[allow(unreachable_code)]
         Ok(Self {
             parts: branches,
-            ending,
             root,
+            _phantom: PhantomData,
         })
     }
 }
 
-impl Display for PositionedDotPath {
+impl<T: PointingTypeTrait> Display for PositionedDotPath<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.root {
             RootType::Root(root) => {
@@ -95,7 +99,7 @@ impl Display for PositionedDotPath {
         let da_rest = self.parts.join(".");
         write!(f, "{da_rest}")?;
 
-        if self.ending == Ending::Branch {
+        if get_pointing_type::<T>() == PointingType::Branch {
             write!(f, ".")?;
         }
 
@@ -103,8 +107,21 @@ impl Display for PositionedDotPath {
     }
 }
 
-impl Into<DotPath> for PositionedDotPath {
-    fn into(self) -> DotPath {
-        DotPath::Positioned(self)
+impl From<PositionedDotPath<DataPointingType>> for PositionedDotPath<BranchPointingType> {
+    fn from(val: PositionedDotPath<DataPointingType>) -> Self {
+        let mut new_thingy = PositionedDotPath {
+            parts: val.parts,
+            root: val.root,
+            _phantom: PhantomData,
+        };
+        let _ = new_thingy.parts.pop();
+
+        new_thingy
     }
 }
+
+// impl Into<DotPath> for PositionedDotPath {
+//     fn into(self) -> DotPath {
+//         DotPath::Positioned(self)
+//     }
+// }

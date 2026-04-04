@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 use crate::{
-    Ending::{Branch, Data},
+    PointingTypeTrait::{Branch, Data},
     PositionedDotPath,
     PositionedDotPathRootType::{Local, Root},
     TrueDotPath, TrueRoot,

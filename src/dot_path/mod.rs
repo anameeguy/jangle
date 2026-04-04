@@ -1,3 +1,4 @@
+pub mod pointing_type;
 pub mod positioned_dot_path;
 #[cfg(test)]
 mod tests;
@@ -45,14 +46,14 @@ impl DotPath {
         }
     }
 
-    pub fn endings(&self) -> Ending {
+    pub fn endings(&self) -> PointingType {
         match self {
             DotPath::Positioned(positioned_dot_path) => positioned_dot_path.ending,
             DotPath::True(true_dot_path) => true_dot_path.ending,
         }
     }
 
-    pub fn endings_mut(&mut self) -> &mut Ending {
+    pub fn endings_mut(&mut self) -> &mut PointingType {
         match self {
             DotPath::Positioned(positioned_dot_path) => &mut positioned_dot_path.ending,
             DotPath::True(true_dot_path) => &mut true_dot_path.ending,
@@ -61,7 +62,7 @@ impl DotPath {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, Copy)]
-pub enum Ending {
+pub enum PointingType {
     Data,
     Branch,
 }
@@ -79,6 +80,12 @@ pub enum DotPathCreationError {
 
     #[error("Tried to construct a completly empty dotpath.")]
     IsEmpty,
+
+    #[error(
+        "You got the wrong ending I guess.\n
+        I am tired of writing these errors."
+    )]
+    WrongEndingIGuess,
 }
 
 impl Display for DotPath {
