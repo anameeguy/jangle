@@ -1,5 +1,5 @@
 use clap::Parser;
-use jangle::TrueDotPath;
+// use jangle::TrueDotPath;
 
 use crate::{
     command::{Cli, Commands},
@@ -16,12 +16,12 @@ fn main() {
     let sheet = Sheet::load("elaugdrin.sheet");
 
     println!("{}", sheet.true_root);
-    println!(
-        "{}",
-        sheet
-            .true_root
-            .is_true_dot_path_valid(&TrueDotPath::new("#.").unwrap())
-    );
+    // println!(
+    //     "{}",
+    //     sheet
+    //         .true_root
+    //         .is_true_dot_path_valid(&TrueDotPath::new("#.").unwrap())
+    // );
     return;
 
     //
