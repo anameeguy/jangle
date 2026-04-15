@@ -1,4 +1,9 @@
 use clap::Parser;
+use jangle::{
+    DotPath,
+    dot_path::{DataTargetTypeStruct, TrueRootTypeStruct},
+};
+use ron::ser::PrettyConfig;
 // use jangle::TrueDotPath;
 
 use crate::{
@@ -12,17 +17,24 @@ mod dir;
 mod sheet;
 mod working_sheet;
 
-fn main() {
+fn main() -> anyhow::Result<()> {
+    let pretty_config = PrettyConfig::new().compact_arrays(true);
+
+    let dotpath = DotPath::<TrueRootTypeStruct, DataTargetTypeStruct>::new("#.beep.beep2.beeping")?;
+
+    println!("{}", ron::ser::to_string_pretty(&dotpath, pretty_config)?);
+
+    #[allow(unused_variables)]
     let sheet = Sheet::load("elaugdrin.sheet");
 
-    println!("{}", sheet.true_root);
+    // println!("{}", sheet.true_root);
     // println!(
     //     "{}",
     //     sheet
     //         .true_root
     //         .is_true_dot_path_valid(&TrueDotPath::new("#.").unwrap())
     // );
-    return;
+    return Ok(());
 
     //
 
@@ -72,4 +84,6 @@ fn main() {
             }
         }
     }
+
+    Ok(())
 }

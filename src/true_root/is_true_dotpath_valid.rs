@@ -1,5 +1,3 @@
-// use crate::Data::{Branch, Value};
-//
 // impl TrueRoot {
 //     pub fn is_true_dot_path_valid(&self, true_dot_path: &TrueDotPath) -> bool {
 //         if true_dot_path.parts.is_empty() {

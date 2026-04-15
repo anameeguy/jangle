@@ -1,7 +1,7 @@
-mod branch;
-mod data;
-mod dot_path;
-mod true_root;
+pub mod branch;
+pub mod data;
+pub mod dot_path;
+pub mod true_root;
 
 pub use branch::Branch;
 pub use data::Data;
