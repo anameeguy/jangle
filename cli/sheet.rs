@@ -4,14 +4,14 @@ use std::{
     path::PathBuf,
 };
 
-use jangle::TrueRoot;
+use jangle::TrueRootSheet;
 use ron::Value;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Sheet {
     pub is_sheet: IsSheet,
-    pub true_root: TrueRoot,
+    pub true_root: TrueRootSheet,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]

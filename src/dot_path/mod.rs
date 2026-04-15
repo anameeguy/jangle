@@ -3,7 +3,7 @@ use std::{
     hash::Hash,
 };
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use thiserror::Error;
 
 pub const TRUE_ROOT_SYMBOL: &str = "#";
@@ -12,7 +12,7 @@ pub const DEFINED_ROOT_START: &str = "[[";
 pub const DEFINED_ROOT_END: &str = "]]";
 pub const IS_BRANCH_SYMBOL: &str = ".";
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub struct DotPath<RootType: RootTypeTrait, TargetType: TargetTypeTrait = GenericTarget> {
     pub path: Vec<String>,
     pub root: RootType,
@@ -125,7 +125,7 @@ impl<RootType: RootTypeTrait, TargetType: TargetTypeTrait> Display
     }
 }
 
-pub trait RootTypeTrait: Debug + Serialize + Clone + PartialEq + Hash {
+pub trait RootTypeTrait: Debug + Serialize + Clone + PartialEq + Hash + DeserializeOwned {
     const ENUM: RootTypeEnum;
 
     fn positioned_root(&self) -> Option<&PositionedRoot> {
@@ -199,7 +199,7 @@ pub enum PositionedRootOrigin {
     Defined(String),
 }
 
-pub trait TargetTypeTrait: Debug + Serialize + Clone + PartialEq + Hash {
+pub trait TargetTypeTrait: Debug + Serialize + Clone + PartialEq + Hash + DeserializeOwned {
     const ENUM: Option<TargetTypeEnum>;
 
     fn data(&self) -> Option<&DataTarget> {
@@ -318,5 +318,23 @@ impl TargetTypeTrait for GenericTarget {
 
     fn generic_mut(&mut self) -> Option<&mut GenericTarget> {
         Some(self)
+    }
+}
+
+impl<RootType: RootTypeTrait, TargetType: TargetTypeTrait> Serialize
+    for DotPath<RootType, TargetType>
+{
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&format!("{self}"))
+    }
+}
+
+impl<'de, RootType: RootTypeTrait, TargetType: TargetTypeTrait> Deserialize<'de>
+    for DotPath<RootType, TargetType>
+{
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        let beep = Self::new(&s).map_err(|e| serde::de::Error::custom(e))?;
+        Ok(beep)
     }
 }

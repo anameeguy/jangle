@@ -20,7 +20,7 @@ mod working_sheet;
 fn main() -> anyhow::Result<()> {
     let pretty_config = PrettyConfig::new().compact_arrays(true);
 
-    let dotpath = DotPath::<TrueRoot>::new("#.beep1.beep2.beep3.")?;
+    let dotpath = DotPath::<TrueRoot>::new("#.beep")?;
 
     println!(
         "{}\n{dotpath}",
