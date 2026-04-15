@@ -13,7 +13,7 @@ pub const DEFINED_ROOT_END: &str = "]]";
 pub const IS_BRANCH_SYMBOL: &str = ".";
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct DotPath<RootType: RootTypeTrait, TargetType: TargetTypeTrait> {
+pub struct DotPath<RootType: RootTypeTrait, TargetType: TargetTypeTrait = GenericTarget> {
     pub path: Vec<String>,
     pub root: RootType,
     pub target: TargetType,
@@ -34,6 +34,7 @@ impl<RootType: RootTypeTrait, TargetType: TargetTypeTrait> DotPath<RootType, Tar
             }
         }
 
+        // Split it I guess.
         let mut split_i_guess: Vec<&str> = better_s.split('.').collect();
 
         // If we got nothin then we have problems.
@@ -98,10 +99,10 @@ impl<RootType: RootTypeTrait, TargetType: TargetTypeTrait> Display
 pub trait RootTypeTrait: Debug + Serialize + Clone + PartialEq + Hash {
     const ENUM: RootTypeEnum;
 
-    fn positioned_root(&self) -> Option<&PositionedRootTypeStruct> {
+    fn positioned_root(&self) -> Option<&PositionedRoot> {
         None
     }
-    fn positioned_root_mut(&mut self) -> Option<&mut PositionedRootTypeStruct> {
+    fn positioned_root_mut(&mut self) -> Option<&mut PositionedRoot> {
         None
     }
 
@@ -109,13 +110,13 @@ pub trait RootTypeTrait: Debug + Serialize + Clone + PartialEq + Hash {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct TrueRootTypeStruct;
+pub struct TrueRoot;
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct PositionedRootTypeStruct {
+pub struct PositionedRoot {
     pub origin: PositionedRootOrigin,
 }
 
-impl RootTypeTrait for TrueRootTypeStruct {
+impl RootTypeTrait for TrueRoot {
     const ENUM: RootTypeEnum = RootTypeEnum::TrueRoot;
 
     fn _construct(root_string: &str) -> Result<Self, DotPathCreationError> {
@@ -127,20 +128,20 @@ impl RootTypeTrait for TrueRootTypeStruct {
     }
 }
 
-impl RootTypeTrait for PositionedRootTypeStruct {
+impl RootTypeTrait for PositionedRoot {
     const ENUM: RootTypeEnum = RootTypeEnum::PositionedRoot;
 
-    fn positioned_root(&self) -> Option<&PositionedRootTypeStruct> {
+    fn positioned_root(&self) -> Option<&PositionedRoot> {
         Some(self)
     }
 
-    fn positioned_root_mut(&mut self) -> Option<&mut PositionedRootTypeStruct> {
+    fn positioned_root_mut(&mut self) -> Option<&mut PositionedRoot> {
         Some(self)
     }
 
     fn _construct(root_string: &str) -> Result<Self, DotPathCreationError> {
         if root_string == LOCAL_SYMBOL {
-            Ok(PositionedRootTypeStruct {
+            Ok(PositionedRoot {
                 origin: PositionedRootOrigin::Local,
             })
         } else {
@@ -150,7 +151,7 @@ impl RootTypeTrait for PositionedRootTypeStruct {
                 .strip_suffix(DEFINED_ROOT_END)
                 .ok_or(DotPathCreationError::WrongRootIGuess)?
                 .to_string();
-            Ok(PositionedRootTypeStruct {
+            Ok(PositionedRoot {
                 origin: PositionedRootOrigin::Defined(dis),
             })
         }
@@ -172,19 +173,19 @@ pub enum PositionedRootOrigin {
 pub trait TargetTypeTrait: Debug + Serialize + Clone + PartialEq + Hash {
     const ENUM: Option<TargetTypeEnum>;
 
-    fn data(&self) -> Option<&DataTargetTypeStruct> {
+    fn data(&self) -> Option<&DataTarget> {
         None
     }
 
-    fn data_mut(&mut self) -> Option<&mut DataTargetTypeStruct> {
+    fn data_mut(&mut self) -> Option<&mut DataTarget> {
         None
     }
 
-    fn generic(&self) -> Option<&GenericTargetTypeStruct> {
+    fn generic(&self) -> Option<&GenericTarget> {
         None
     }
 
-    fn generic_mut(&mut self) -> Option<&mut GenericTargetTypeStruct> {
+    fn generic_mut(&mut self) -> Option<&mut GenericTarget> {
         None
     }
 
@@ -201,27 +202,27 @@ pub enum TargetTypeEnum {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct DataTargetTypeStruct {
+pub struct DataTarget {
     pub data_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub struct BranchTargetTypeStruct;
+pub struct BranchTarget;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Hash)]
-pub enum GenericTargetTypeStruct {
-    Data(DataTargetTypeStruct),
+pub enum GenericTarget {
+    Data(DataTarget),
     Branch,
 }
 
-impl TargetTypeTrait for DataTargetTypeStruct {
+impl TargetTypeTrait for DataTarget {
     const ENUM: Option<TargetTypeEnum> = Some(TargetTypeEnum::Data);
 
-    fn data(&self) -> Option<&DataTargetTypeStruct> {
+    fn data(&self) -> Option<&DataTarget> {
         Some(self)
     }
 
-    fn data_mut(&mut self) -> Option<&mut DataTargetTypeStruct> {
+    fn data_mut(&mut self) -> Option<&mut DataTarget> {
         Some(self)
     }
 
@@ -230,7 +231,7 @@ impl TargetTypeTrait for DataTargetTypeStruct {
         stuff: &mut Vec<&str>,
         projected_target_type: TargetTypeEnum,
     ) -> Result<Self, DotPathCreationError> {
-        Ok(DataTargetTypeStruct {
+        Ok(DataTarget {
             data_name: stuff
                 .pop()
                 .ok_or(DotPathCreationError::PointingAtRootDataError)?
@@ -239,7 +240,7 @@ impl TargetTypeTrait for DataTargetTypeStruct {
     }
 }
 
-impl TargetTypeTrait for BranchTargetTypeStruct {
+impl TargetTypeTrait for BranchTarget {
     const ENUM: Option<TargetTypeEnum> = Some(TargetTypeEnum::Branch);
 
     #[allow(unused_variables)]
@@ -247,11 +248,11 @@ impl TargetTypeTrait for BranchTargetTypeStruct {
         stuff: &mut Vec<&str>,
         projected_target_type: TargetTypeEnum,
     ) -> Result<Self, DotPathCreationError> {
-        Ok(BranchTargetTypeStruct)
+        Ok(BranchTarget)
     }
 }
 
-impl TargetTypeTrait for GenericTargetTypeStruct {
+impl TargetTypeTrait for GenericTarget {
     const ENUM: Option<TargetTypeEnum> = None;
 
     fn _construct(
@@ -259,34 +260,34 @@ impl TargetTypeTrait for GenericTargetTypeStruct {
         projected_target_type: TargetTypeEnum,
     ) -> Result<Self, DotPathCreationError> {
         Ok(match projected_target_type {
-            TargetTypeEnum::Data => GenericTargetTypeStruct::Data(
-                DataTargetTypeStruct::_construct(stuff, projected_target_type)?,
-            ),
-            TargetTypeEnum::Branch => GenericTargetTypeStruct::Branch,
+            TargetTypeEnum::Data => {
+                GenericTarget::Data(DataTarget::_construct(stuff, projected_target_type)?)
+            }
+            TargetTypeEnum::Branch => GenericTarget::Branch,
         })
     }
 
-    fn data(&self) -> Option<&DataTargetTypeStruct> {
-        if let GenericTargetTypeStruct::Data(data_target) = self {
+    fn data(&self) -> Option<&DataTarget> {
+        if let GenericTarget::Data(data_target) = self {
             Some(data_target)
         } else {
             None
         }
     }
 
-    fn data_mut(&mut self) -> Option<&mut DataTargetTypeStruct> {
-        if let GenericTargetTypeStruct::Data(data_target) = self {
+    fn data_mut(&mut self) -> Option<&mut DataTarget> {
+        if let GenericTarget::Data(data_target) = self {
             Some(data_target)
         } else {
             None
         }
     }
 
-    fn generic(&self) -> Option<&GenericTargetTypeStruct> {
+    fn generic(&self) -> Option<&GenericTarget> {
         Some(self)
     }
 
-    fn generic_mut(&mut self) -> Option<&mut GenericTargetTypeStruct> {
+    fn generic_mut(&mut self) -> Option<&mut GenericTarget> {
         Some(self)
     }
 }

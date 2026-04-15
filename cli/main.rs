@@ -1,10 +1,9 @@
 use clap::Parser;
 use jangle::{
     DotPath,
-    dot_path::{DataTargetTypeStruct, TrueRootTypeStruct},
+    dot_path::{DataTarget, TrueRoot},
 };
 use ron::ser::PrettyConfig;
-// use jangle::TrueDotPath;
 
 use crate::{
     command::{Cli, Commands},
@@ -20,7 +19,7 @@ mod working_sheet;
 fn main() -> anyhow::Result<()> {
     let pretty_config = PrettyConfig::new().compact_arrays(true);
 
-    let dotpath = DotPath::<TrueRootTypeStruct, DataTargetTypeStruct>::new("#.beep.beep2.beeping")?;
+    let dotpath = DotPath::<TrueRoot, DataTarget>::new("#.")?;
 
     println!("{}", ron::ser::to_string_pretty(&dotpath, pretty_config)?);
 
