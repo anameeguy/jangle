@@ -1,7 +1,8 @@
 use clap::Parser;
+#[allow(unused_imports)]
 use jangle::{
     DotPath,
-    dot_path::{DataTarget, TrueRoot},
+    dot_path::{BranchTarget, DataTarget, PositionedRoot, TrueRoot},
 };
 use ron::ser::PrettyConfig;
 
@@ -19,9 +20,12 @@ mod working_sheet;
 fn main() -> anyhow::Result<()> {
     let pretty_config = PrettyConfig::new().compact_arrays(true);
 
-    let dotpath = DotPath::<TrueRoot, DataTarget>::new("#.")?;
+    let dotpath = DotPath::<TrueRoot>::new("#.beep1.beep2.beep3.")?;
 
-    println!("{}", ron::ser::to_string_pretty(&dotpath, pretty_config)?);
+    println!(
+        "{}\n{dotpath}",
+        ron::ser::to_string_pretty(&dotpath, pretty_config)?
+    );
 
     #[allow(unused_variables)]
     let sheet = Sheet::load("elaugdrin.sheet");

@@ -92,7 +92,36 @@ impl<RootType: RootTypeTrait, TargetType: TargetTypeTrait> Display
 {
     #[allow(unused_variables)]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        // Root stuff.
+        if let Some(beep) = self.root.positioned_root() {
+            match &beep.origin {
+                PositionedRootOrigin::Local => write!(f, "{LOCAL_SYMBOL}")?,
+                PositionedRootOrigin::Defined(s) => {
+                    write!(f, "{DEFINED_ROOT_START}{s}{DEFINED_ROOT_END}")?
+                }
+            }
+        } else {
+            write!(f, "{TRUE_ROOT_SYMBOL}")?;
+        }
+
+        // Dot for reasons.
+        write!(f, ".")?;
+
+        // Write the branches.
+        let branches = self.path.join(".");
+        write!(f, "{branches}")?;
+
+        // Add a dot if their are branches.
+        if !self.path.is_empty() {
+            write!(f, ".")?;
+        }
+
+        // Do data if it is their.
+        if let Some(beep) = self.target.data() {
+            write!(f, "{}", beep.data_name)?;
+        }
+
+        Ok(())
     }
 }
 
