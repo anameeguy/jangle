@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::Data;
+use crate::Branchlet;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Branch {
     /// The stuff that is, ya know, in the branch.
-    pub stuff: HashMap<String, Data>,
+    pub stuff: HashMap<String, Branchlet>,
     /// If this is active then it will be used to conider the root rather then the branch name.
     pub root_name: Option<String>,
 }

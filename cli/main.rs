@@ -33,9 +33,10 @@ fn main() -> anyhow::Result<()> {
     println!("{}", sheet.true_root);
     println!(
         "{}",
-        sheet
-            .true_root
-            .is_true_dot_path_valid(&DotPath::<TrueRoot>::new("#.skills.insight.").unwrap())
+        sheet.true_root.truly_root_dotpath(
+            &DotPath::<PositionedRoot>::new("$.skills.stealth.bonus")?,
+            &DotPath::<TrueRoot, BranchTarget>::new("#.skills.stealth.bonus.")?
+        )?
     );
     return Ok(());
 
