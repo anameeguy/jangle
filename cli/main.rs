@@ -30,13 +30,13 @@ fn main() -> anyhow::Result<()> {
     #[allow(unused_variables)]
     let sheet = Sheet::load("elaugdrin.sheet");
 
-    // println!("{}", sheet.true_root);
-    // println!(
-    //     "{}",
-    //     sheet
-    //         .true_root
-    //         .is_true_dot_path_valid(&TrueDotPath::new("#.").unwrap())
-    // );
+    println!("{}", sheet.true_root);
+    println!(
+        "{}",
+        sheet
+            .true_root
+            .is_true_dot_path_valid(&DotPath::<TrueRoot>::new("#.skills.insight.").unwrap())
+    );
     return Ok(());
 
     //

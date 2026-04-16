@@ -1,7 +1,7 @@
 mod truly_root_dotpath;
 
 use crate::{
-    Branch, DotPath,
+    Branch, Data, DotPath,
     dot_path::{TargetTypeTrait, TrueRoot},
 };
 use serde::{Deserialize, Serialize};
@@ -62,24 +62,26 @@ impl TrueRootSheet {
         &self,
         true_dot_path: &DotPath<TrueRoot, TargetType>,
     ) -> bool {
-        // if true_dot_path.parts.is_empty() {
-        //     return true_dot_path.ending == Ending::Branch;
-        // }
+        let mut current = &self.root;
 
-        // let mut current = &self.root;
+        let mut iter = <Vec<std::string::String> as Clone>::clone(&true_dot_path.path).into_iter();
+        while let Some(b) = iter.next() {
+            if let Some(Data::Branch(beep)) = current.stuff.get(&b) {
+                current = beep;
+            } else {
+                return false;
+            }
+        }
 
-        // for part in &true_dot_path.parts[..true_dot_path.parts.len().saturating_sub(1)] {
-        //     match current.stuff.get(part) {
-        //         Some(Branch(branch)) => current = branch,
-        //         _ => return false,
-        //     }
-        // }
+        if let Some(data_target) = true_dot_path.target.data() {
+            let data_name = &data_target.data_name;
+            if let Some(Data::Value(_)) = current.stuff.get(data_name) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-        // match (true_dot_path.parts.last(), true_dot_path.ending) {
-        //     (Some(last), Ending::Data) => matches!(current.stuff.get(last), Some(Value(_))),
-        //     (Some(last), Ending::Branch) => matches!(current.stuff.get(last), Some(Branch(_))),
-        //     _ => false,
-        // }
-        todo!()
+        true
     }
 }
