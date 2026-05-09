@@ -31,13 +31,7 @@ fn main() -> anyhow::Result<()> {
     let sheet = Sheet::load("elaugdrin.sheet");
 
     println!("{}", sheet.true_root);
-    println!(
-        "{}",
-        sheet.true_root.truly_root_dotpath(
-            &DotPath::<PositionedRoot>::new("$.skills.stealth.bonus")?,
-            &DotPath::<TrueRoot, BranchTarget>::new("#.skills.stealth.bonus.")?
-        )?
-    );
+    println!("{}", sheet.true_root);
     return Ok(());
 
     //
