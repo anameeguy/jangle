@@ -30,8 +30,7 @@ fn main() -> anyhow::Result<()> {
     #[allow(unused_variables)]
     let sheet = Sheet::load("elaugdrin.sheet");
 
-    println!("{}", sheet.true_root);
-    println!("{}", sheet.true_root);
+    // println!("{}", sheet.true_root);
     return Ok(());
 
     //

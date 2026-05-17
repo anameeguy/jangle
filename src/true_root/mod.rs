@@ -32,7 +32,7 @@ impl std::fmt::Display for TrueRootSheet {
                         if let Some(root_name) = &b.root_name {
                             root_name_printed = format!("({}) ", root_name);
                         }
-                        format!("⤸\n{}", print_branch(b, level + 1))
+                        format!("󱞣\n{}", print_branch(b, level + 1))
                     }
                 };
                 total.push_str(&format!(
