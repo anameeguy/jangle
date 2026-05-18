@@ -1,7 +1,8 @@
-mod truly_root_dotpath;
+use std::{fmt::Display, io, path::Path};
 
 use crate::{
     Branch, Branchlet, DotPath,
+    branch::{BranchToBytesError, LoadBranchError},
     dot_path::{BranchTarget, PositionedRoot, TargetTypeTrait, TrueRoot},
 };
 use serde::{Deserialize, Serialize};
@@ -10,52 +11,6 @@ use thiserror::Error;
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TrueRootSheet {
     pub root: Branch,
-}
-
-impl std::fmt::Display for TrueRootSheet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        fn print_branch(branch: &Branch, level: usize) -> String {
-            // Get keys from stuff and order them alphabetically
-            let mut keys: Vec<_> = branch.stuff.keys().collect();
-            keys.sort();
-            let mut total = String::new();
-            for key in keys {
-                let value = branch.stuff.get(key).unwrap();
-                let mut root_name_printed = String::new();
-                let printed = match value {
-                    crate::Branchlet::Value(value) => match value {
-                        crate::data::Data::Int(i) => format!("{i}"),
-                        crate::data::Data::Float(f) => format!("{f}"),
-                        crate::data::Data::String(s) => format!("{s:?}"),
-                    },
-                    crate::Branchlet::Branch(b) => {
-                        if let Some(root_name) = &b.root_name {
-                            root_name_printed = format!("({}) ", root_name);
-                        }
-                        format!("󱞣\n{}", print_branch(b, level + 1))
-                    }
-                };
-                total.push_str(&format!(
-                    "{}{root_name_printed}{key}: {printed}\n",
-                    " ".repeat(level * 4)
-                ));
-            }
-
-            if let Some(new) = total.strip_suffix("\n") {
-                total = new.to_string();
-            }
-
-            return total;
-        }
-
-        if let Some(root_name) = &self.root.root_name {
-            writeln!(f, "({})", root_name)?;
-        }
-
-        writeln!(f, "{}", print_branch(&self.root, 0))?;
-
-        Ok(())
-    }
 }
 
 impl TrueRootSheet {
@@ -183,6 +138,27 @@ impl TrueRootSheet {
 
         Ok(beep)
     }
+
+    // Just some shortcuts to save and load the root branch.
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.root.to_bytes()
+    }
+
+    pub fn from_bytes(b: &[u8]) -> Result<Self, BranchToBytesError> {
+        Ok(Self {
+            root: Branch::from_bytes(b)?,
+        })
+    }
+
+    pub fn save<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
+        self.root.save(path)
+    }
+
+    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadBranchError> {
+        Ok(Self {
+            root: Branch::load(path)?,
+        })
+    }
 }
 
 #[derive(Debug, Error)]
@@ -197,4 +173,10 @@ pub enum TrulyRootDotpathError {
 
     #[error("Wasn't able to find the defined root.")]
     NoDefinedRoot,
+}
+
+impl Display for TrueRootSheet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.root.fmt(f)
+    }
 }

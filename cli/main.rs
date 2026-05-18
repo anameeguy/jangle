@@ -1,4 +1,5 @@
 use clap::Parser;
+use jangle::TrueRootSheet;
 #[allow(unused_imports)]
 use jangle::{
     DotPath,
@@ -8,17 +9,17 @@ use ron::ser::PrettyConfig;
 
 use crate::{
     command::{Cli, Commands},
-    sheet::Sheet,
     working_sheet::{get_working_sheet_location, set_working_sheet},
 };
 
 mod command;
 mod dir;
-mod sheet;
 mod working_sheet;
 
 fn main() -> anyhow::Result<()> {
     let pretty_config = PrettyConfig::new().compact_arrays(true);
+
+    TrueRootSheet::default().save("testy.sheet").unwrap();
 
     let dotpath = DotPath::<TrueRoot>::new("#.beep")?;
 
@@ -28,9 +29,9 @@ fn main() -> anyhow::Result<()> {
     );
 
     #[allow(unused_variables)]
-    let sheet = Sheet::load("elaugdrin.sheet");
+    let sheet = TrueRootSheet::load("elaugdrin.sheet").unwrap();
 
-    // println!("{}", sheet.true_root);
+    println!("{}", sheet);
     return Ok(());
 
     //
@@ -54,7 +55,7 @@ fn main() -> anyhow::Result<()> {
                 .try_exists()
                 .expect("Can't check if file at path exists for whatever reason.")
             {
-                Sheet::default().save(path);
+                TrueRootSheet::default().save(path).unwrap();
 
                 if !ignore {
                     set_working_sheet(path);
@@ -72,13 +73,13 @@ fn main() -> anyhow::Result<()> {
                 println!("There doesn't appear to be a working sheet at the moment.")
             }
         }
-        Commands::Work { path } => {
-            if Sheet::is_sheet_at_path(path) {
-                set_working_sheet(path);
-                println!("Working directory set!");
-            } else {
-                println!("That is not a Jangle sheet.");
-            }
+        Commands::Work { path: _ } => {
+            // if Sheet::is_sheet_at_path(path) {
+            //     set_working_sheet(path);
+            //     println!("Working directory set!");
+            // } else {
+            //     println!("That is not a Jangle sheet.");
+            // }
         }
     }
 

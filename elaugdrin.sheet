@@ -1,160 +1,155 @@
 (
-    is_sheet: (),
-    true_root: (
-        root: (
-            stuff: {
-                "character": Branch((
-                    stuff: {
-                        "name": Value(String("elaugdrin")),
-                        "race": Value(String("drow")),
-                        "class": Value(String("rogue")),
-                        "subclass": Value(String("soulknife")),
-                        "level": Value(Int(5)),
-                        "background": Value(String("haunted-one")),
-                        "alignment": Value(String("chaotic-neutral")),
-                    },
-                    root_name: None,
-                )),
+stuff: {
+    "character": Branch((
+        stuff: {
+            "name": Value(String("elaugdrin")),
+            "race": Value(String("drow")),
+            "class": Value(String("rogue")),
+            "subclass": Value(String("soulknife")),
+            "level": Value(Int(5)),
+            "background": Value(String("haunted-one")),
+            "alignment": Value(String("chaotic-neutral")),
+        },
+        root_name: None,
+    )),
 
-                "abilities": Branch((
-                    stuff: {
-                        "strength": Value(Int(10)),
-                        "dexterity": Value(Int(17)),
-                        "constitution": Value(Int(14)),
-                        "intelligence": Value(Int(12)),
-                        "wisdom": Value(Int(11)),
-                        "charisma": Value(Int(17)),
-                    },
-                    root_name: None,
-                )),
+    "abilities": Branch((
+        stuff: {
+            "strength": Value(Int(10)),
+            "dexterity": Value(Int(17)),
+            "constitution": Value(Int(14)),
+            "intelligence": Value(Int(12)),
+            "wisdom": Value(Int(11)),
+            "charisma": Value(Int(17)),
+        },
+        root_name: None,
+    )),
 
-                "combat": Branch((
-                    stuff: {
-                        "armor-class": Value(Int(15)),
-                        "initiative": Value(Int(3)),
-                        "speed": Value(Int(30)),
-                        "hit-points": Value(Int(38)),
-                    },
-                    root_name: None,
-                )),
+    "combat": Branch((
+        stuff: {
+            "armor-class": Value(Int(15)),
+            "initiative": Value(Int(3)),
+            "speed": Value(Int(30)),
+            "hit-points": Value(Int(38)),
+        },
+        root_name: None,
+    )),
 
-                "skills": Branch((
-                    stuff: {
-                        "stealth": Branch((
-                            stuff: {
-                                "bonus": Value(Int(9)),
-                                "expertise": Value(Int(1)),
-                            },
-                            root_name: Some("skill"),
-                        )),
-                        "intimidation": Branch((
-                            stuff: {
-                                "bonus": Value(Int(9)),
-                                "expertise": Value(Int(1)),
-                            },
-                            root_name: Some("skill"),
-                        )),
-                        "acrobatics": Value(Int(6)),
-                        "deception": Value(Int(6)),
-                        "insight": Value(Int(3)),
-                        "perception": Value(Int(3)),
-                    },
-                    root_name: None,
-                )),
+    "skills": Branch((
+        stuff: {
+            "stealth": Branch((
+                stuff: {
+                    "bonus": Value(Int(9)),
+                    "expertise": Value(Int(1)),
+                },
+                root_name: Some("skill"),
+            )),
+            "intimidation": Branch((
+                stuff: {
+                    "bonus": Value(Int(9)),
+                    "expertise": Value(Int(1)),
+                },
+                root_name: Some("skill"),
+            )),
+            "acrobatics": Value(Int(6)),
+            "deception": Value(Int(6)),
+            "insight": Value(Int(3)),
+            "perception": Value(Int(3)),
+        },
+        root_name: None,
+    )),
 
-                "attacks": Branch((
-                    stuff: {
-                        "psychic-blades": Branch((
-                            stuff: {
-                                "attack-bonus": Value(Int(6)),
-                                "damage-main": Value(String("1d6+3-psychic")),
-                                "damage-bonus": Value(String("1d4+3-psychic")),
-                                "flavor": Value(String("shadow-axes-formed-from-angst")),
-                            },
-                            root_name: Some("attack"),
-                        )),
-                    },
-                    root_name: None,
-                )),
+    "attacks": Branch((
+        stuff: {
+            "psychic-blades": Branch((
+                stuff: {
+                    "attack-bonus": Value(Int(6)),
+                    "damage-main": Value(String("1d6+3-psychic")),
+                    "damage-bonus": Value(String("1d4+3-psychic")),
+                    "flavor": Value(String("shadow-axes-formed-from-angst")),
+                },
+                root_name: Some("attack"),
+            )),
+        },
+        root_name: None,
+    )),
 
-                "features": Branch((
-                    stuff: {
-                        "sneak-attack": Branch((
-                            stuff: {
-                                "damage": Value(String("3d6")),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                        "cunning-action": Branch((
-                            stuff: {
-                                "effects": Value(String("dash-disengage-hide")),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                        "uncanny-dodge": Branch((
-                            stuff: {
-                                "effect": Value(String("halve-damage")),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                        "psi-bolstered-knack": Branch((
-                            stuff: {},
-                            root_name: Some("feature"),
-                        )),
-                        "psychic-whispers": Branch((
-                            stuff: {
-                                "effect": Value(String("telepathy")),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                        "homing-strikes": Branch((
-                            stuff: {
-                                "effect": Value(String("turn-miss-into-hit")),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                    },
-                    root_name: None,
-                )),
+    "features": Branch((
+        stuff: {
+            "sneak-attack": Branch((
+                stuff: {
+                    "damage": Value(String("3d6")),
+                },
+                root_name: Some("feature"),
+            )),
+            "cunning-action": Branch((
+                stuff: {
+                    "effects": Value(String("dash-disengage-hide")),
+                },
+                root_name: Some("feature"),
+            )),
+            "uncanny-dodge": Branch((
+                stuff: {
+                    "effect": Value(String("halve-damage")),
+                },
+                root_name: Some("feature"),
+            )),
+            "psi-bolstered-knack": Branch((
+                stuff: {},
+                root_name: Some("feature"),
+            )),
+            "psychic-whispers": Branch((
+                stuff: {
+                    "effect": Value(String("telepathy")),
+                },
+                root_name: Some("feature"),
+            )),
+            "homing-strikes": Branch((
+                stuff: {
+                    "effect": Value(String("turn-miss-into-hit")),
+                },
+                root_name: Some("feature"),
+            )),
+        },
+        root_name: None,
+    )),
 
-                "racial-traits": Branch((
-                    stuff: {
-                        "darkvision": Value(String("120ft")),
-                        "sunlight-sensitivity": Value(Int(1)),
-                        "fey-ancestry": Value(String("advantage-vs-charm")),
-                        "drow-magic": Branch((
-                            stuff: {
-                                "dancing-lights": Value(Int(1)),
-                                "faerie-fire": Value(Int(1)),
-                                "darkness": Value(Int(1)),
-                            },
-                            root_name: Some("feature"),
-                        )),
-                    },
-                    root_name: None,
-                )),
+    "racial-traits": Branch((
+        stuff: {
+            "darkvision": Value(String("120ft")),
+            "sunlight-sensitivity": Value(Int(1)),
+            "fey-ancestry": Value(String("advantage-vs-charm")),
+            "drow-magic": Branch((
+                stuff: {
+                    "dancing-lights": Value(Int(1)),
+                    "faerie-fire": Value(Int(1)),
+                    "darkness": Value(Int(1)),
+                },
+                root_name: Some("feature"),
+            )),
+        },
+        root_name: None,
+    )),
 
-                "equipment": Branch((
-                    stuff: {
-                        "armor": Value(String("studded-leather")),
-                        "tools": Value(String("thieves-tools")),
-                        "cloak": Value(String("dark-cloak")),
-                        "keepsake": Value(String("mysterious-past-item")),
-                    },
-                    root_name: None,
-                )),
+    "equipment": Branch((
+        stuff: {
+            "armor": Value(String("studded-leather")),
+            "tools": Value(String("thieves-tools")),
+            "cloak": Value(String("dark-cloak")),
+            "keepsake": Value(String("mysterious-past-item")),
+        },
+        root_name: None,
+    )),
 
-                "personality": Branch((
-                    stuff: {
-                        "traits": Value(String("brooding-intense")),
-                        "ideals": Value(String("power")),
-                        "bonds": Value(String("haunted-past")),
-                        "flaws": Value(String("pushes-people-away")),
-                    },
-                    root_name: None,
-                )),
-            },
-            root_name: Some("player-character-sheet"),
-        ),
-    )
+    "personality": Branch((
+        stuff: {
+            "traits": Value(String("brooding-intense")),
+            "ideals": Value(String("power")),
+            "bonds": Value(String("haunted-past")),
+            "flaws": Value(String("pushes-people-away")),
+        },
+        root_name: None,
+    )),
+},
+root_name: Some("player-character-sheet"),
 )
