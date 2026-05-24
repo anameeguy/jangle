@@ -4,13 +4,18 @@ use std::{
     path::PathBuf,
 };
 
+use jangle::{
+    DotPath,
+    dot_path::{BranchTarget, TrueRoot},
+};
 use serde::{Deserialize, Serialize};
 
 use crate::dir;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct WorkingSheetCache {
-    pub working_sheet_path: PathBuf,
+    pub working_sheet_path: PathBuf, // TODO Make this an `Option`.
+    pub working_branch_path: Option<DotPath<TrueRoot, BranchTarget>>,
 }
 
 impl WorkingSheetCache {

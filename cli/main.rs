@@ -1,3 +1,4 @@
+use anyhow::Context;
 use clap::Parser;
 use jangle::TrueRootSheet;
 #[allow(unused_imports)]
@@ -9,53 +10,31 @@ use ron::ser::PrettyConfig;
 
 use crate::{
     command::{Cli, Commands},
-    working_sheet::{get_working_sheet_location, set_working_sheet},
+    working_sheet::{WorkingSheetCache, get_working_sheet_location, set_working_sheet},
 };
 
 mod command;
 mod dir;
+mod generic_root_dotpath;
 mod working_sheet;
 
 fn main() -> anyhow::Result<()> {
+    #[allow(unused_variables)]
     let pretty_config = PrettyConfig::new().compact_arrays(true);
 
-    TrueRootSheet::default().save("testy.sheet").unwrap();
-
-    let dotpath = DotPath::<TrueRoot>::new("#.beep")?;
-
-    println!(
-        "{}\n{dotpath}",
-        ron::ser::to_string_pretty(&dotpath, pretty_config)?
-    );
-
-    #[allow(unused_variables)]
-    let sheet = TrueRootSheet::load("elaugdrin.sheet").unwrap();
-
-    println!("{}", sheet);
-    return Ok(());
-
     //
 
-    //
-
-    //
-
-    //
-
-    //
-
-    #[allow(unreachable_code)]
     let cli = Cli::parse();
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
-    match &cli.command {
+    match cli.command {
         Commands::New { path, ignore } => {
             if !path
                 .try_exists()
                 .expect("Can't check if file at path exists for whatever reason.")
             {
-                TrueRootSheet::default().save(path).unwrap();
+                TrueRootSheet::default().save(&path).unwrap();
 
                 if !ignore {
                     set_working_sheet(path);
@@ -73,13 +52,49 @@ fn main() -> anyhow::Result<()> {
                 println!("There doesn't appear to be a working sheet at the moment.")
             }
         }
-        Commands::Work { path: _ } => {
-            // if Sheet::is_sheet_at_path(path) {
-            //     set_working_sheet(path);
-            //     println!("Working directory set!");
-            // } else {
-            //     println!("That is not a Jangle sheet.");
-            // }
+        Commands::Work { path } => {
+            // TODO: Make this actually properly check the file to make sure that it is good.
+            set_working_sheet(path);
+            println!("Working sheet updated.");
+        }
+        Commands::Sheet {
+            sheet_path,
+            command,
+        } => {
+            #[allow(unused_variables)]
+            let (sheet_path, is_hard_defined) = if let Some(actual_sheet_path) = sheet_path {
+                (actual_sheet_path, true)
+            } else {
+                (
+                    get_working_sheet_location()
+                        .context("Failed to find a working sheet location. Likely doesn't exist")?,
+                    false,
+                )
+            };
+
+            match command {
+                #[allow(unused_variables)]
+                command::SheetCommands::Work {
+                    branch_path,
+                    position,
+                } => {
+                    let actual_position = if let Some(defined_position) = position {
+                        defined_position
+                    } else {
+                        let working_sheet_cache = WorkingSheetCache::get(); // TODO: Remove the need to pull from cache multiple times.
+
+                        if is_hard_defined {
+                            None.context("You must have a defined branch position if the sheet path is defined.")?;
+                        }
+
+                        working_sheet_cache
+                            .working_branch_path
+                            .context("Working branch not set.")?
+                    };
+
+                    println!("{actual_position}");
+                }
+            }
         }
     }
 
