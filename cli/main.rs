@@ -53,7 +53,7 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Work { path } => {
-            // TODO: Make this actually properly check the file to make sure that it is good.
+            // TODO: Make this actually properly checks the file to make sure that it is good.
             set_working_sheet(path);
             println!("Working sheet updated.");
         }
