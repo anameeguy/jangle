@@ -74,25 +74,23 @@ fn main() -> anyhow::Result<()> {
 
             match command {
                 #[allow(unused_variables)]
-                command::SheetCommands::Work {
-                    branch_path,
-                    position,
-                } => {
-                    let actual_position = if let Some(defined_position) = position {
-                        defined_position
-                    } else {
-                        let working_sheet_cache = WorkingSheetCache::get(); // TODO: Remove the need to pull from cache multiple times.
+                command::SheetCommands::Work { branch_path } => {
+                    let working_sheet_cache = WorkingSheetCache::get(); // TODO: Remove the need to pull from cache multiple times.
 
-                        if is_hard_defined {
-                            None.context("You must have a defined branch position if the sheet path is defined.")?;
+                    match branch_path {
+                        generic_root_dotpath::GenericRootDotpath::TrueRootDotpath(dot_path) => {
+                            //
+
+                            todo!()
                         }
+                        generic_root_dotpath::GenericRootDotpath::PositionedRootDotpath(
+                            dot_path,
+                        ) => {
+                            //
 
-                        working_sheet_cache
-                            .working_branch_path
-                            .context("Working branch not set.")?
-                    };
-
-                    println!("{actual_position}");
+                            todo!()
+                        }
+                    }
                 }
             }
         }

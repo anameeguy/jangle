@@ -53,12 +53,7 @@ pub enum SheetCommands {
     /// Sets the current working branch within the working sheet.
     Work {
         /// Dotpath to the new working branch.
+        /// Must have be a true root if using a defined sheet.
         branch_path: GenericRootDotpath<BranchTarget>,
-
-        /// Defines the refrence location for a local root.
-        /// If left as none it will be the current working branch.
-        /// This is required if not on the working sheet.
-        #[arg(short = 'r', long, value_parser = DotPath::<TrueRoot, BranchTarget>::new)]
-        position: Option<DotPath<TrueRoot, BranchTarget>>,
     },
 }

@@ -1,9 +1,12 @@
 use std::str::FromStr;
 
+use anyhow::{Context, Result};
 use jangle::{
-    DotPath, DotPathCreationError,
+    DotPath, DotPathCreationError, TrueRootSheet,
     dot_path::{self, GenericTarget, PositionedRoot, TargetTypeTrait, TrueRoot},
 };
+
+use crate::working_sheet::WorkingSheetCache;
 
 // TODO: Make this not suck.
 
@@ -27,6 +30,33 @@ impl<TargetType: TargetTypeTrait> FromStr for GenericRootDotpath<TargetType> {
             // We (prolly) have a positioned root.
             let result = DotPath::<PositionedRoot, TargetType>::new(s)?;
             Ok(Self::PositionedRootDotpath(result))
+        }
+    }
+}
+
+impl<TargetType: TargetTypeTrait> GenericRootDotpath<TargetType> {
+    pub fn get_a_true_root_based_on_working_branch<'a>(
+        &'a self,
+        working_sheet_cache: &WorkingSheetCache,
+        sheet: &TrueRootSheet,
+    ) -> Result<&'a DotPath<TrueRoot, TargetType>> {
+        match &self {
+            GenericRootDotpath::TrueRootDotpath(dot_path) => {
+                // If it is already a true root then not much to do now is there.
+                Ok(dot_path)
+            }
+            GenericRootDotpath::PositionedRootDotpath(dot_path) => {
+                let working_branch = &working_sheet_cache.working_branch_path;
+
+                let thingy = working_sheet_cache
+                    .working_branch_path
+                    .as_ref()
+                    .context("")?;
+                let thingy3 = sheet.truly_root_dotpath::<TargetType>(dot_path, &thingy);
+
+                // .context("No working branch path in config")
+                todo!()
+            }
         }
     }
 }
